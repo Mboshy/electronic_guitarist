@@ -1,4 +1,4 @@
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 import time
 from note_recognition import note_recognition
 from dictio import fret_dict, string_dict, hit_dict
@@ -6,19 +6,24 @@ import cv2
 import glob
 
 
-tempo = 1.0
-
 def image_choice():
+    """
+    Choosing photo with music notation to be played.
+
+    :return: Photo with music notation
+    """
     songs = {}
     chosen = False
     index = 1
 
+    # Getting each song from directory
     for file in glob.glob('samples/songs/*'):
         f = file.split("songs\\", 1)[1]
         print('{}.'.format(index), f.split(".", 1)[0])
         songs[f.split(".", 1)[0]] = f
         index += 1
 
+    # Loop with latch to choose an image
     while not chosen:
         choice = input("Choose one song from above: ")
         if choice in songs.keys():
@@ -30,6 +35,11 @@ def image_choice():
 
 
 def template_list():
+    """
+    Getting all the pictures with templates note
+
+    :return: list of templates
+    """
     list_template = []
 
     for file in glob.glob('samples/notes/quarter/*'):
@@ -41,6 +51,9 @@ def template_list():
 
 
 def setup():
+    """
+    It sets all GPIO for output mode
+    """
     GPIO.setmode(GPIO.BCM)
     GPIO.cleanup()
     GPIO.setwarnings(0)
@@ -72,16 +85,21 @@ def setup():
     GPIO.setup(27, GPIO.OUT)
 
 
-def switcher():
-    pitch, string, lenght = note_recognition()
+def switcher(image, templates, tempo):
+    """
+    It control all GPIO and switch the state of voltage.
 
-    for p, s, l in zip(pitch, string, lenght):
+    :param image: Image with music notation
+    :param templates: Images with templates
+    """
+    pitch, string, length = note_recognition(image, templates)
+
+    for p, s, l in zip(pitch, string, length):
         try:
             time.sleep(0.1)
             GPIO.output(fret_dict[p], 1)
             time.sleep(0.1)
         except Exception as e:
-            # print(e)
             pass
 
         try:
@@ -89,7 +107,6 @@ def switcher():
             GPIO.output(string_dict[s], hit_dict[s])
             time.sleep(tempo * l)
         except Exception as e:
-            # print(e)
             pass
 
         try:
@@ -97,30 +114,38 @@ def switcher():
             GPIO.output(fret_dict[p], 0)
             time.sleep(0.1)
         except Exception as e:
-            # print(e)
             pass
 
-def switchi(image, templates):
-    pitch, string, lenght = note_recognition(image, templates)
 
-    for p, s, l in zip(pitch, string, lenght):
+def switchi(image, templates, tempo):
+    """
+    Auxiliary function printing information of each note.
+
+    :param image: Image with music notation
+    :param templates: Images with templates    """
+    pitch, string, length = note_recognition(image, templates)
+
+    for p, s, l in zip(pitch, string, length):
         try:
             hit_dict[s] = not hit_dict[s]
-            print('Prog:', p % 10, '  struna:', s, ' 5V:', hit_dict[s], ' dlugosc:', tempo * l / 5)
+            print('Fret:', p % 10, '  String:', s, ' 5V:', hit_dict[s], ' Length:', tempo * l / 5)
         except Exception as e:
-            # print(e)
             pass
 
+
 def main():
-    # setup()
-    # switcher()
+    tempo = 1.0
     image = image_choice()
     templates = template_list()
-    switchi(image, templates)
 
-    # for i in range(2, 27):
-    #     GPIO.output(i, 0)
-    # GPIO.cleanup()
+    setup()
+    switcher(image, templates, tempo)
+    switchi(image, templates, tempo)
+
+    # Setting all actuators to idle position
+    for i in range(2, 27):
+        GPIO.output(i, 0)
+    GPIO.cleanup()
 
 
 if __name__ == '__main__':

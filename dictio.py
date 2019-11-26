@@ -1,3 +1,4 @@
+# Dictionary created for translation names of tones
 pitch_dict = {'G1': 13,
               'FIS1': 12,
               'F1': 11,
@@ -23,6 +24,7 @@ pitch_dict = {'G1': 13,
               'E6': 60,
               'UPS': 0}
 
+# Dictionary created for translation strings to GPIO number
 string_dict = {1: 4,
                2: 14,
                3: 15,
@@ -30,6 +32,7 @@ string_dict = {1: 4,
                5: 17,
                6: 27}
 
+# Dictionary created for translation frets (#1 - string, #2 - fret) to GPIO number
 fret_dict = {14: 22,
              13: 23,
              12: 24,
@@ -49,6 +52,7 @@ fret_dict = {14: 22,
              62: 20,
              61: 21}
 
+# Dictionary created for operating actuators responsible for hitting the string
 hit_dict = {1: False,
             2: False,
             3: False,

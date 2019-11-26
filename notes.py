@@ -1,3 +1,4 @@
+# Class containing most useful data of note
 class Note:
     def __init__(self, pitch, order, lenght, x, y):
         self.pitch = pitch
@@ -9,6 +10,7 @@ class Note:
         self.y = y
 
 
+# Class containing most useful data of staff
 class Staff:
     def __init__(self, lines):
         self.line_1 = lines[4]
@@ -21,4 +23,3 @@ class Staff:
         self.line_bottom_1 = self.line_1 + self.space_between
         self.line_bottom_2 = self.line_1 + 2*self.space_between
         self.line_bottom_3 = self.line_1 + 3*self.space_between
-
